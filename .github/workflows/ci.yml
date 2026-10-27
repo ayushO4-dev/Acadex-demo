@@ -43,7 +43,7 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           package_json_file: frontend/package.json
       - uses: actions/setup-node@v5
@@ -71,7 +71,7 @@ jobs:
       - name: cargo deny
         working-directory: backend
         run: cargo deny check advisories licenses bans sources
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           package_json_file: frontend/package.json
       - uses: actions/setup-node@v5
