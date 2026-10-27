@@ -128,3 +128,7 @@ just test-frontend   # ESLint and TypeScript
 ```
 
 `just` lists the other recipes (start, stop, reset, logs).
+
+## License
+
+[MIT](LICENSE)
