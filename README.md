@@ -4,6 +4,8 @@ A runnable demo of **Acadex**, a cloud-native university ERP: attendance, result
 
 It runs on your machine with one command, as **Northgate University**, a fictional university with 500 made-up students and staff. Sign in as any of them with one click; there's no account to create.
 
+![A student's attendance: the overall percentage, a month calendar and each subject against the 75% line](docs/screenshots/attendance.png)
+
 > This is a stripped-down version of the full product, which is built for Google Cloud. The demo keeps the core student journey and the parts of the architecture that matter most, and swaps the cloud services for small local stand-ins. See [What's in the demo](#whats-in-the-demo).
 
 ## Run it
@@ -28,6 +30,9 @@ docker compose down -v && docker compose up --build
 ## A five-minute tour
 
 Pick a person on the sign-in page. Each one shows a different part of the system:
+
+<img src="docs/screenshots/signin.png" alt="The sign-in page: pick one of six made-up people" width="720">
+
 
 | Sign in as | Try this |
 |---|---|
