@@ -19,7 +19,7 @@ base64 = "0.22"
 axum = { version = "0.8", features = ["multipart"] }
 hex = "0.4"
 lettre = { version = "0.11", default-features = false, features = ["builder", "smtp-transport", "tokio1-rustls-tls", "hostname"] }
-hmac = "0.12"
+hmac = "0.13"
 chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
 chrono-tz = "0.10"
 jsonwebtoken = { version = "11", features = ["rust_crypto"] }
