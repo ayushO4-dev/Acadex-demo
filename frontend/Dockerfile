@@ -2,7 +2,7 @@
 # acadex-web: Next.js standalone server on distroless Node, as a non-root user.
 # Secrets and URLs come from the environment at run time, never the image.
 
-FROM node:24-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable
