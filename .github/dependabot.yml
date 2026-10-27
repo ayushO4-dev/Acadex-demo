@@ -1,0 +1,25 @@
+# Weekly dependency updates (architecture.md §13): Rust, the web app, the
+# CI actions and the base images.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /backend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      patch: { update-types: [patch] }
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      patch: { update-types: [patch] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directory: /backend
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule: { interval: weekly }

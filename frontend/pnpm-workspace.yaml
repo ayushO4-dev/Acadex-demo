@@ -1,0 +1,6 @@
+allowBuilds:
+  unrs-resolver: false
+# Next.js pins an old postcss with known advisories; the patched release is
+# compatible (just audit / CI's supply-chain job).
+overrides:
+  postcss: ">=8.5.23"

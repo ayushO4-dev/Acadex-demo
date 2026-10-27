@@ -1,0 +1,17 @@
+# Rust
+/backend/target/
+
+# Node (frontend/.gitignore covers Next.js output)
+node_modules/
+
+# Local secrets, written by setup.sh
+.env
+.env.local
+
+# Files the services store when run outside Docker
+/backend/storage/
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/

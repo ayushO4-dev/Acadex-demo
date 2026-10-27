@@ -1,0 +1,35 @@
+[package]
+name = "acadex-worker"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+acadex-cloud.workspace = true
+acadex-db.workspace = true
+acadex-telemetry.workspace = true
+anyhow.workspace = true
+axum.workspace = true
+base64.workspace = true
+chrono.workspace = true
+chrono-tz.workspace = true
+lettre.workspace = true
+qrcode.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+tokio = { workspace = true, features = ["net", "io-util", "time"] }
+tower-http.workspace = true
+tracing.workspace = true
+typst.workspace = true
+typst-as-lib.workspace = true
+typst-layout.workspace = true
+typst-assets.workspace = true
+typst-pdf.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+tower.workspace = true
+
+[lints]
+workspace = true

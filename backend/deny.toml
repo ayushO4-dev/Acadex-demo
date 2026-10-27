@@ -1,0 +1,62 @@
+# cargo-deny (architecture.md §13, dependencies): run by `just audit` and CI.
+
+[graph]
+all-features = true
+
+# Known vulnerabilities and unmaintained crates, from the RustSec database.
+[advisories]
+version = 2
+yanked = "deny"
+# The same accepted advisories as .cargo/audit.toml, which says why for each.
+ignore = [
+    "RUSTSEC-2023-0071",
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+    "RUSTSEC-2025-0141",
+    "RUSTSEC-2024-0436",
+    "RUSTSEC-2026-0206",
+    "RUSTSEC-2026-0192",
+    "RUSTSEC-2024-0449",
+    "RUSTSEC-2024-0320",
+]
+
+# Licences that may ship in Acadex: permissive ones only.
+[licenses]
+version = 2
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "0BSD",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "CDLA-Permissive-2.0",
+    "MPL-2.0",
+    "OFL-1.1",
+    "Ubuntu-font-1.0",
+    "BSL-1.0",
+    "CC0-1.0",
+    "MIT-0",
+    "OpenSSL",
+]
+confidence-threshold = 0.9
+
+# Our own crates are never published (publish = false), so carry no licence.
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+# Our own crates depend on each other by path.
+allow-wildcard-paths = true
+
+# Crates come from crates.io only: no git dependencies, no other registries.
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

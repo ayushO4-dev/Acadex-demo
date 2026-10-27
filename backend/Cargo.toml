@@ -1,0 +1,57 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace.dependencies]
+acadex-auth = { path = "crates/acadex-auth" }
+acadex-cloud = { path = "crates/acadex-cloud" }
+acadex-db = { path = "crates/acadex-db" }
+acadex-telemetry = { path = "crates/acadex-telemetry" }
+
+aes-gcm = "0.10"
+anyhow = "1"
+base64 = "0.22"
+axum = { version = "0.8", features = ["multipart"] }
+hex = "0.4"
+lettre = { version = "0.11", default-features = false, features = ["builder", "smtp-transport", "tokio1-rustls-tls", "hostname"] }
+hmac = "0.12"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+chrono-tz = "0.10"
+jsonwebtoken = { version = "11", features = ["rust_crypto"] }
+moka = { version = "0.12", features = ["future"] }
+opentelemetry = "0.33"
+opentelemetry-otlp = "0.33"
+opentelemetry_sdk = "0.33"
+qrcode = { version = "0.14", default-features = false, features = ["svg"] }
+redis = { version = "1.7", default-features = false, features = ["tokio-comp", "connection-manager", "script"] }
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "http2", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "uuid", "chrono", "json"] }
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "sync"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+futures-util = { version = "0.3", default-features = false }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.7", features = ["trace", "set-header"] }
+tracing = "0.1"
+tracing-opentelemetry = "0.34"
+typst = "0.15"
+typst-as-lib = "0.16"
+typst-layout = "0.15"
+typst-assets = { version = "0.15", features = ["fonts"] }
+typst-pdf = "0.15"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1", features = ["serde", "v4"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }

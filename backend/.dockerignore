@@ -1,0 +1,6 @@
+target
+Dockerfile
+.dockerignore
+# The image's own stable Rust builds it; the toolchain file would have rustup
+# download rustfmt and clippy too, which a release build never uses.
+rust-toolchain.toml

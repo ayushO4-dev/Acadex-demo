@@ -1,0 +1,23 @@
+# cargo-audit: advisories accepted, each with why it can't reach Acadex.
+# Re-check whenever typst or jsonwebtoken is upgraded (Dependabot opens those).
+[advisories]
+ignore = [
+    # rsa, Marvin attack: a timing side channel on private-key operations.
+    # Acadex only verifies Auth0's RS256 signatures with public keys; the
+    # private key is used only by test tooling to mint test tokens.
+    "RUSTSEC-2023-0071",
+    # quick-xml 0.38, via typst's bibliography support (citationberg): we
+    # render our own Typst templates, with no bibliographies or CSL files,
+    # so no untrusted XML reaches it.
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+    # Unmaintained (no known vulnerability), all inside typst's PDF and font
+    # stack, with no maintained drop-in: bincode, paste, rustybuzz,
+    # ttf-parser, unsafe-libyaml, yaml-rust.
+    "RUSTSEC-2025-0141",
+    "RUSTSEC-2024-0436",
+    "RUSTSEC-2026-0206",
+    "RUSTSEC-2026-0192",
+    "RUSTSEC-2024-0449",
+    "RUSTSEC-2024-0320",
+]

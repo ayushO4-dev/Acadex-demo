@@ -1,0 +1,93 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      # Database tests create a throwaway database each, so they connect as a superuser.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: acadex
+          POSTGRES_PASSWORD: acadex
+          POSTGRES_DB: acadex
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U acadex" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      DATABASE_URL: postgres://acadex:acadex@localhost:5432/acadex
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - run: cargo fmt --all --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --locked
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+
+  # Known vulnerabilities, licences and sources (architecture.md §13), and a
+  # CycloneDX SBOM of each deliverable, kept with the run.
+  supply-chain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit,cargo-deny,cargo-cyclonedx
+      - name: cargo audit
+        working-directory: backend
+        run: cargo audit --deny warnings
+      - name: cargo deny
+        working-directory: backend
+        run: cargo deny check advisories licenses bans sources
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: pnpm audit
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile && pnpm audit --prod --audit-level high
+      - name: SBOMs
+        run: |
+          mkdir -p sbom
+          (cd backend && cargo cyclonedx --format json --all-features && find . -name '*.cdx.json' -exec cp {} ../sbom/ \;)
+          npx --yes @cyclonedx/cdxgen@11 -t js -o sbom/acadex-web.cdx.json frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom/

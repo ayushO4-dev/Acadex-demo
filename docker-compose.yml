@@ -1,0 +1,97 @@
+# The whole demo: `./setup.sh` once, then `docker compose up --build`, then
+# open http://localhost:3000. Only the website is published on the host.
+name: acadex-demo
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgres://acadex_api:acadex_api@postgres:5432/acadex
+  RECEIPTS_BUCKET: receipts
+  UPLOADS_BUCKET: uploads
+  STORAGE_DIR: /var/lib/acadex/files
+  # Events go straight to the worker, as a Pub/Sub push subscription would.
+  WORKER_PUSH_URL: http://worker:8081/pubsub/push
+  PAYMENT_GATEWAY_URL: http://web:3000/mock-gateway/api
+  PAYMENT_GATEWAY_KEY: rzp_test_demo
+  PAYMENT_CHECKOUT_URL: http://localhost:3000/mock-gateway/checkout
+  APP_BASE_URL: http://localhost:3000
+  RUST_LOG: info
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: acadex
+      POSTGRES_PASSWORD: acadex
+      POSTGRES_DB: acadex
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Creates the app's role, which row-level security applies to.
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U acadex -d acadex"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate: # the schema, row-level security policies and functions
+    image: acadex-demo-api
+    build: { context: ./backend, target: api }
+    command: ["migrate"]
+    environment:
+      DATABASE_ADMIN_URL: postgres://acadex:acadex@postgres:5432/acadex
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  seed: # Northgate University's demo data; each file is applied once
+    image: acadex-demo-api
+    command: ["seed"]
+    environment:
+      DATABASE_ADMIN_URL: postgres://acadex:acadex@postgres:5432/acadex
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  files: # gives the shared PDF volume to the services' non-root user
+    image: busybox:1.37
+    command: ["chown", "-R", "65532:65532", "/var/lib/acadex/files"]
+    volumes: ["files:/var/lib/acadex/files"]
+
+  api:
+    image: acadex-demo-api
+    env_file: .env
+    environment: *backend-env
+    volumes: ["files:/var/lib/acadex/files"]
+    depends_on:
+      seed: { condition: service_completed_successfully }
+      files: { condition: service_completed_successfully }
+
+  worker: # makes receipt and grade-card PDFs; runs the scheduled jobs
+    image: acadex-demo-worker
+    build: { context: ./backend, target: worker }
+    env_file: .env
+    environment:
+      <<: *backend-env
+      LOCAL_SCHEDULER: "true"
+    volumes: ["files:/var/lib/acadex/files"]
+    depends_on:
+      seed: { condition: service_completed_successfully }
+      files: { condition: service_completed_successfully }
+
+  web:
+    image: acadex-demo-web
+    build: { context: ./frontend }
+    env_file: .env
+    environment:
+      ACADEX_API_URL: http://api:8080
+      APP_BASE_URL: http://localhost:3000
+      # The test payment gateway: a checkout page in the website that signs
+      # webhooks like Razorpay. It remembers payments here, across restarts.
+      MOCK_GATEWAY: "true"
+      MOCK_GATEWAY_STATE: /var/lib/mock-gateway/state.json
+      PAYMENT_GATEWAY_KEY: rzp_test_demo
+    volumes: ["mock-gateway:/var/lib/mock-gateway"]
+    ports: ["3000:3000"]
+    depends_on: [api, worker]
+
+volumes:
+  postgres-data:
+  files:
+  mock-gateway:
