@@ -87,7 +87,7 @@ jobs:
           mkdir -p sbom
           (cd backend && cargo cyclonedx --format json --all-features && find . -name '*.cdx.json' -exec cp {} ../sbom/ \;)
           npx --yes @cyclonedx/cdxgen@11 -t js -o sbom/acadex-web.cdx.json frontend
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: sbom/
